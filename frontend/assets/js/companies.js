@@ -220,11 +220,12 @@ export function renderCompaniesView(main) {
     let result = null;
   
     try {
+      // Limit scraping size for demo to reduce API usage and avoid hitting OpenAI quota
       result = await apiClient.runScraping({
         parameters: {
           source: document.getElementById('scrapingSource')?.value || 'remotive',
           query,
-          max_items: 30,
+          max_items: 3,
           only_riwi_relevant: true,
           require_junior_focus: false
         }
