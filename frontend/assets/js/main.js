@@ -73,8 +73,10 @@ function showAppShell(user) {
         </div>
       </div>
     </aside>
+    <div id="sidebar-backdrop" class="sidebar-backdrop" aria-hidden="true"></div>
     <div id="app-wrapper">
       <div id="topbar">
+        <button type="button" id="btnSidebarToggle" class="topbar-hamburger" aria-label="Open menu">☰</button>
         <div class="topbar-search">
           <span style="color:#475569;font-size:13px;">🔍</span>
           <input type="text" placeholder="Search companies..." />
@@ -109,12 +111,45 @@ function showAppShell(user) {
     },
   });
 
+  function closeSidebar() {
+    document.body.classList.remove('sidebar-open');
+    const backdrop = document.getElementById('sidebar-backdrop');
+    if (backdrop) {
+      backdrop.setAttribute('aria-hidden', 'true');
+    }
+  }
+
+  function openSidebar() {
+    document.body.classList.add('sidebar-open');
+    const backdrop = document.getElementById('sidebar-backdrop');
+    if (backdrop) {
+      backdrop.setAttribute('aria-hidden', 'false');
+    }
+  }
+
+  const btnSidebarToggle = document.getElementById('btnSidebarToggle');
+  if (btnSidebarToggle) {
+    btnSidebarToggle.addEventListener('click', () => {
+      if (document.body.classList.contains('sidebar-open')) {
+        closeSidebar();
+      } else {
+        openSidebar();
+      }
+    });
+  }
+
+  const sidebarBackdrop = document.getElementById('sidebar-backdrop');
+  if (sidebarBackdrop) {
+    sidebarBackdrop.addEventListener('click', closeSidebar);
+  }
+
   document.querySelectorAll('#sidebar .nav-item').forEach((btn) => {
     btn.addEventListener('click', () => {
       const view = btn.dataset.view;
       setActiveNav(view);
       navigateTo(view);
       window.location.hash = view;
+      closeSidebar();
     });
   });
 
