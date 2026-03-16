@@ -1,0 +1,22 @@
+# API
+fastapi
+uvicorn[standard]
+pydantic[email]
+
+# Database
+psycopg2-binary
+
+# Environment
+python-dotenv
+
+# Auth (password hashing + JWT)
+werkzeug
+PyJWT
+
+# AI
+openai
+
+# HTTP & scraping
+requests
+beautifulsoup4
+lxml

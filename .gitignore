@@ -1,0 +1,70 @@
+# --- Environment and secrets (never commit) ---
+.env
+.env.local
+.env.*.local
+*.pem
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.pyc
+*.pyo
+*.pyd
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# --- Virtual environments ---
+.venv/
+venv/
+ENV/
+env/
+.virtualenv/
+
+# --- Tests and quality ---
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+htmlcov/
+.coverage
+.coverage.*
+coverage.xml
+*.cover
+.hypothesis/
+
+# --- Node (if using npm in frontend) ---
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# --- IDE / editor ---
+.idea/
+*.swp
+*.swo
+*~
+
+# --- OS ---
+.DS_Store
+Thumbs.db
+
+# --- Logs and temporary files ---
+*.log
+tmp/
+temp/
+.cache/
