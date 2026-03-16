@@ -69,68 +69,49 @@ export function renderDashboardView(main) {
   `;
 
   async function loadDashboardStats() {
-    if (!document.getElementById('kpiTotalCompanies')) return;
-
     try {
       const stats = await apiClient.getDashboardStats();
-      if (stats) {
-        const el1 = document.getElementById('kpiTotalCompanies');
-        const el2 = document.getElementById('kpiEmailsSent');
-        const el3 = document.getElementById('kpiScored');
-        const el4 = document.getElementById('kpiHighScore');
-        if (el1) el1.textContent = stats.total_companies ?? '—';
-        if (el2) el2.textContent = stats.emails_sent ?? '—';
-        if (el3) el3.textContent = stats.scored_companies ?? '—';
-        if (el4) el4.textContent = stats.high_score_companies ?? '—';
-      }
-    } catch (_) {
+      // Verificamos de nuevo después del await
       const el1 = document.getElementById('kpiTotalCompanies');
+      if (!el1) return; // Si el usuario se fue de la página, dejamos de ejecutar
+
       const el2 = document.getElementById('kpiEmailsSent');
       const el3 = document.getElementById('kpiScored');
       const el4 = document.getElementById('kpiHighScore');
-      if (el1) el1.textContent = '0';
-      if (el2) el2.textContent = '0';
-      if (el3) el3.textContent = '0';
-      if (el4) el4.textContent = '0';
+
+      if (el1) el1.textContent = stats?.total_companies ?? '0';
+      if (el2) el2.textContent = stats?.emails_sent ?? '0';
+      if (el3) el3.textContent = stats?.scored_companies ?? '0';
+      if (el4) el4.textContent = stats?.high_score_companies ?? '0';
+    } catch (err) {
+      console.warn("Stats no cargados, posiblemente cambiaste de vista.");
     }
+
     try {
       const top = await apiClient.getCompaniesTop();
       const el = document.getElementById('topCompaniesList');
-      if (el) {
-        if (Array.isArray(top) && top.length > 0) {
-          el.innerHTML = top
-            .map(
-              (c) =>
-                `<div class="reporte-item"><span class="reporte-item-ico">🏢</span><span><strong>${c.name || '—'}</strong> ${c.category || ''} · Score ${c.score ?? '—'}</span></div>`
-            )
-            .join('');
-        } else {
-          el.innerHTML = '<p style="color:#64748b;font-size:13px;">No companies with score yet.</p>';
-        }
+      if (!el) return; // Verificación de seguridad
+
+      if (Array.isArray(top) && top.length > 0) {
+        el.innerHTML = top.map(c => 
+          `<div class="reporte-item"><span><strong>${c.name || '—'}</strong> · ${c.score ?? '—'}</span></div>`
+        ).join('');
+      } else {
+        el.innerHTML = '<p>No data.</p>';
       }
-    } catch (_) {
-      const el = document.getElementById('topCompaniesList');
-      if (el) el.innerHTML = '<p style="color:#64748b;font-size:13px;">Could not load top companies.</p>';
-    }
+    } catch (err) { /* Silencio */ }
+
     try {
       const trend = await apiClient.getTechnologiesTrending();
       const el = document.getElementById('trendingTechList');
-      if (el) {
-        if (Array.isArray(trend) && trend.length > 0) {
-          el.innerHTML = trend
-            .map(
-              (t) =>
-                `<div class="reporte-item"><span class="reporte-item-ico">⚙</span><span><strong>${t.name_tech || '—'}</strong> · ${t.companies_using ?? 0} companies</span></div>`
-            )
-            .join('');
-        } else {
-          el.innerHTML = '<p style="color:#64748b;font-size:13px;">No technologies yet.</p>';
-        }
+      if (!el) return; // Verificación de seguridad
+
+      if (Array.isArray(trend) && trend.length > 0) {
+        el.innerHTML = trend.map(t => 
+          `<div class="reporte-item"><span><strong>${t.name_tech || '—'}</strong> · ${t.companies_using ?? 0}</span></div>`
+        ).join('');
       }
-    } catch (_) {
-      const el = document.getElementById('trendingTechList');
-      if (el) el.innerHTML = '<p style="color:#64748b;font-size:13px;">Could not load trending tech.</p>';
-    }
+    } catch (err) { /* Silencio */ }
   }
   loadDashboardStats();
 }
