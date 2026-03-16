@@ -74,10 +74,14 @@ export function renderDashboardView(main) {
     try {
       const stats = await apiClient.getDashboardStats();
       if (stats) {
-        document.getElementById('kpiTotalCompanies').textContent = stats.total_companies ?? '—';
-        document.getElementById('kpiEmailsSent').textContent = stats.emails_sent ?? '—';
-        document.getElementById('kpiScored').textContent = stats.scored_companies ?? '—';
-        document.getElementById('kpiHighScore').textContent = stats.high_score_companies ?? '—';
+        const el1 = document.getElementById('kpiTotalCompanies');
+        const el2 = document.getElementById('kpiEmailsSent');
+        const el3 = document.getElementById('kpiScored');
+        const el4 = document.getElementById('kpiHighScore');
+        if (el1) el1.textContent = stats.total_companies ?? '—';
+        if (el2) el2.textContent = stats.emails_sent ?? '—';
+        if (el3) el3.textContent = stats.scored_companies ?? '—';
+        if (el4) el4.textContent = stats.high_score_companies ?? '—';
       }
     } catch (_) {
       const el1 = document.getElementById('kpiTotalCompanies');
