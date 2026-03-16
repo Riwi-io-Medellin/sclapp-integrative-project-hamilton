@@ -4,11 +4,16 @@ Serves the API under /api and the frontend (SPA) at /.
 """
 
 from pathlib import Path
+import mimetypes
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
+
+mimetypes.add_type("application/javascript", ".js")
+mimetypes.add_type("application/javascript", ".mjs")
+mimetypes.add_type("text/css", ".css")
 
 from backend.core.config import get_settings
 from backend.api.v1 import auth, companies, dashboard, scraping, emails, profile
