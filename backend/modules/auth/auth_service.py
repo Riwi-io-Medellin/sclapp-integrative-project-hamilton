@@ -114,7 +114,7 @@ class AuthService:
             user_name = f"{user_name_base}{suffix}"
 
         role_row = execute_query(
-            "SELECT id_role FROM public."role" WHERE code = %s LIMIT 1",
+            'SELECT id_role FROM public."role" WHERE code = %s LIMIT 1',
             ("user",),
         )
         if not role_row:
