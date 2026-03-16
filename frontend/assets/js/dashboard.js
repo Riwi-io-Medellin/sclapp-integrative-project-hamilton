@@ -69,6 +69,8 @@ export function renderDashboardView(main) {
   `;
 
   async function loadDashboardStats() {
+    if (!document.getElementById('kpiTotalCompanies')) return;
+
     try {
       const stats = await apiClient.getDashboardStats();
       if (stats) {
@@ -78,10 +80,14 @@ export function renderDashboardView(main) {
         document.getElementById('kpiHighScore').textContent = stats.high_score_companies ?? '—';
       }
     } catch (_) {
-      document.getElementById('kpiTotalCompanies').textContent = '0';
-      document.getElementById('kpiEmailsSent').textContent = '0';
-      document.getElementById('kpiScored').textContent = '0';
-      document.getElementById('kpiHighScore').textContent = '0';
+      const el1 = document.getElementById('kpiTotalCompanies');
+      const el2 = document.getElementById('kpiEmailsSent');
+      const el3 = document.getElementById('kpiScored');
+      const el4 = document.getElementById('kpiHighScore');
+      if (el1) el1.textContent = '0';
+      if (el2) el2.textContent = '0';
+      if (el3) el3.textContent = '0';
+      if (el4) el4.textContent = '0';
     }
     try {
       const top = await apiClient.getCompaniesTop();
