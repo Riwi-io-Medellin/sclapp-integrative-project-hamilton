@@ -3,6 +3,7 @@
 from fastapi import APIRouter
 
 from backend.db.connection import execute_query
+from backend.services.ai.dashboard_report import generate_dashboard_ai_report
 
 router = APIRouter(prefix="/dashboard", tags=["dashboard"])
 
@@ -60,23 +61,17 @@ def get_dashboard_metrics():
 
 @router.get("/ai-report")
 def get_ai_report():
-    """AI-generated report items for the dashboard (placeholder or real AI later)."""
-    return {
-        "items": [
-            {
-                "icon": "📊",
-                "title": "Positive trend:",
-                "description": "Companies using React and Python have a 34% higher probability of hiring junior talent.",
-            },
-            {
-                "icon": "🎯",
-                "title": "Recommendation:",
-                "description": "Prioritize fintech startups — 3x higher reply rate than enterprise companies.",
-            },
-            {
-                "icon": "⚡",
-                "title": "Opportunity:",
-                "description": '18 companies in "Negotiation" have had no follow-up for more than 5 days. Re-contact is recommended.',
-            },
-        ]
+    """
+    Endpoint AI para el dashboard.
+
+    Devuelve un JSON con:
+    {
+      "summary": str,
+      "highlights": [str, ...],
+      "recommendation": str
     }
+
+    Usa métricas reales de la DB y OpenAI si está configurado; si falla, devuelve un fallback útil
+    basado en los mismos datos reales para no romper la UI.
+    """
+    return generate_dashboard_ai_report()
