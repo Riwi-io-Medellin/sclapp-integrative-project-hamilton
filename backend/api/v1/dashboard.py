@@ -75,3 +75,39 @@ def get_ai_report():
     basado en los mismos datos reales para no romper la UI.
     """
     return generate_dashboard_ai_report()
+
+
+@router.get("/score-distribution")
+def get_score_distribution():
+    """
+    Distribución global de empresas con score asignado.
+
+    Retorna:
+    {
+      "high": number,    # score = 3
+      "medium": number,  # score = 2
+      "low": number,     # score = 1
+      "total_scored": number  # score IS NOT NULL
+    }
+    """
+    row = execute_query(
+        """
+        SELECT
+          SUM(CASE WHEN score = 3 THEN 1 ELSE 0 END) AS high,
+          SUM(CASE WHEN score = 2 THEN 1 ELSE 0 END) AS medium,
+          SUM(CASE WHEN score = 1 THEN 1 ELSE 0 END) AS low,
+          SUM(CASE WHEN score IS NOT NULL THEN 1 ELSE 0 END) AS total_scored
+        FROM company
+        """
+    )
+
+    if not row:
+        return {"high": 0, "medium": 0, "low": 0, "total_scored": 0}
+
+    r = row[0]
+    return {
+        "high": int(r.get("high") or 0),
+        "medium": int(r.get("medium") or 0),
+        "low": int(r.get("low") or 0),
+        "total_scored": int(r.get("total_scored") or 0),
+    }

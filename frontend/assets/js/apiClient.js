@@ -79,6 +79,10 @@ export const apiClient = {
     return request('/dashboard/ai-report');
   },
 
+  getDashboardScoreDistribution() {
+    return request('/dashboard/score-distribution');
+  },
+
   getCompaniesTop() {
     return request('/companies/top');
   },
