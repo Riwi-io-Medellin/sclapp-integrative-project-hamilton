@@ -8,19 +8,22 @@ import mimetypes
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
-
-mimetypes.add_type("application/javascript", ".js")
-mimetypes.add_type("application/javascript", ".mjs")
-mimetypes.add_type("text/css", ".css")
+from fastapi.staticfiles import StaticFiles
 
 from backend.core.config import get_settings
 from backend.api.v1 import auth, companies, dashboard, scraping, emails, profile
 
-# Path to frontend (project root / frontend)
-FRONTEND_DIR = Path(__file__).resolve().parent.parent / "frontend"
+# Ensure correct MIME types for static assets
+mimetypes.add_type("application/javascript", ".js")
+mimetypes.add_type("application/javascript", ".mjs")
+mimetypes.add_type("text/css", ".css")
+
+# Project paths
+BASE_DIR = Path(__file__).resolve().parent.parent
+FRONTEND_DIR = BASE_DIR / "frontend"
 FRONTEND_ASSETS = FRONTEND_DIR / "assets"
+INDEX_FILE = FRONTEND_DIR / "index.html"
 
 app = FastAPI(
     title="SCLAPP API",
@@ -28,6 +31,7 @@ app = FastAPI(
     version="1.0.0",
 )
 
+# CORS
 settings = get_settings()
 app.add_middleware(
     CORSMiddleware,
@@ -37,7 +41,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# API routers first (under /api)
+# API routers
 app.include_router(auth.router, prefix="/api")
 app.include_router(companies.router, prefix="/api")
 app.include_router(dashboard.router, prefix="/api")
@@ -48,32 +52,34 @@ app.include_router(profile.router, prefix="/api")
 
 @app.get("/health")
 def health():
-    """Health check for load balancers or monitoring."""
+    """Health check for Render / monitoring."""
     return {"status": "ok"}
 
 
-# Static assets (CSS, JS, images)
+# Serve static frontend assets
 if FRONTEND_ASSETS.exists():
     app.mount("/assets", StaticFiles(directory=str(FRONTEND_ASSETS)), name="assets")
 
 
-# SPA: serve index.html for / and for any non-API path so the frontend router can handle hash routes
 @app.get("/")
 def serve_spa_root():
-    """Serve the single-page app entry (index.html) at root."""
-    if not FRONTEND_DIR.exists():
-        return {"message": "SCLAPP API is running", "docs": "/docs"}
-    index_path = FRONTEND_DIR / "index.html"
-    if not index_path.exists():
-        return {"message": "SCLAPP API is running", "docs": "/docs"}
-    return FileResponse(str(index_path))
+    """Serve SPA entrypoint at root."""
+    if INDEX_FILE.exists():
+        return FileResponse(str(INDEX_FILE))
+    return {"message": "SCLAPP API is running", "docs": "/docs"}
 
 
 @app.get("/{full_path:path}")
 def serve_spa_fallback(full_path: str):
-    """Return index.html for SPA routes (so refresh on /dashboard etc. works)."""
-    if full_path.startswith("api/") or full_path.startswith("docs") or full_path.startswith("openapi"):
+    """
+    Serve index.html for SPA routes such as /dashboard or /companies.
+    Excludes API and docs routes.
+    """
+    blocked_prefixes = ("api/", "docs", "openapi", "redoc", "health", "assets/")
+    if full_path.startswith(blocked_prefixes):
         raise HTTPException(status_code=404, detail="Not Found")
-    if not (FRONTEND_DIR / "index.html").exists():
-        raise HTTPException(status_code=404, detail="Not Found")
-    return FileResponse(str(FRONTEND_DIR / "index.html"))
+
+    if INDEX_FILE.exists():
+        return FileResponse(str(INDEX_FILE))
+
+    raise HTTPException(status_code=404, detail="Frontend not found")
